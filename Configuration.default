@@ -1,6 +1,10 @@
 #format: sh
 ######################################################################
-# Load MGI Config
+# 
+# Configuration file for mgigff product. 
+# ==> Most of mgigff's settings are in the file config.cfg !! This file is 
+# basically a bridge to tie mgigff into mgiconfig's settings.
+#
 
 if [ "${MGICONFIG}" = "" ]
 then
@@ -16,7 +20,4 @@ export FTPURL
 
 GNUSORT=/usr/local/bin/sort
 export GNUSORT
-
-#PYTHONPATH=${PYTHONPATH}:/home/jer/work/python/lib
-#export PYTHONPATH
 
