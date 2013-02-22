@@ -1,0 +1,22 @@
+#format: sh
+######################################################################
+# Load MGI Config
+
+if [ "${MGICONFIG}" = "" ]
+then
+    MGICONFIG=/usr/local/mgi/live/mgiconfig
+    export MGICONFIG
+fi
+
+. ${MGICONFIG}/master.config.sh
+
+
+FTPURL=ftp.informatics.jax.org
+export FTPURL
+
+GNUSORT=/usr/local/bin/sort
+export GNUSORT
+
+#PYTHONPATH=${PYTHONPATH}:/home/jer/work/python/lib
+#export PYTHONPATH
+
