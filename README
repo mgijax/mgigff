@@ -1,0 +1,21 @@
+
+There are TWO configuration files for this product! 
+
+Configuration.default - this is the mgiconfig configuration file required for an MGI
+    software product. Copy to Configuration and edit as needed. It basically sets some
+    environment variables accessed in config.cfg
+
+config.cfg - this contains most of the settings for the mgigff product. mgigff was developed
+    independently of the MGI framework, and has always used Python's standard ConfigParser lib. 
+    Parameter values in config.cfg can reference other parameters *or environment variables*
+    by name. This is how the environment set up by mgiconfig makes its way into the config
+    settings. For example:
+
+    distributionPath=/pub/mgigff
+    distributionDirectory=%(ftproot)s%(distributionpath)s
+
+    Note the case. All variable references use lower case. (FIXME)
+
+The default configuration for this product is for running in production mode (run on hobbiton,
+distribute the results to the public ftp site).
+
