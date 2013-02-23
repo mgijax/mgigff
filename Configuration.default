@@ -1,9 +1,7 @@
 #format: sh
-######################################################################
 # 
-# Configuration file for mgigff product. 
-# ==> Most of mgigff's settings are in the file config.cfg !! This file is 
-# basically a bridge to tie mgigff into mgiconfig's settings.
+# Configuration file (mgiconfig) for mgigff product.
+# See also: config.cfg in this directory.
 #
 
 if [ "${MGICONFIG}" = "" ]
