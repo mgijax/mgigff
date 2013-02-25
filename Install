@@ -17,19 +17,7 @@ then
     exit 1
 fi
 
-MGIGFFHOME=`pwd`
-export MGIGFFHOME
-
-cat > ${MGIGFFHOME}/mgigff.sh << EOF
-#!/bin/sh
-MGIGFFHOME=${MGIGFFHOME}
-export MGIGFFHOME
-. \${MGIGFFHOME}/Configuration
-\${PYTHON} \${MGIGFFHOME}/bin/mgigff.py \$*
-
-EOF
-
-chmod 555 ${MGIGFFHOME}/mgigff.sh
+chmod 755 ./mgigff.sh
 
 echo "Installation successful."
 exit 0
