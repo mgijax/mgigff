@@ -1,7 +1,10 @@
 #
 # seqid2fa.py
 #
-# Fetches sequences from entrez by id.
+# Fetches sequences from entrez by id. Input is a single-column file of ids.
+# Output is a fasta-formatted file of sequences from Genank (technically, from the nucleotide 
+# database accessible via NCBI eutils).
+#
 #
 
 import sys
@@ -11,14 +14,17 @@ import urllib
 import xml.dom.minidom
 
 FETCHURL  = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
-BATCHSIZE =1000
-SLEEPTIME =1
+BATCHSIZE = 1000
+SLEEPTIME = 1
 TOOL      = "MGI"
 EMAIL     = "Joel.Richardson@jax.org"
+NTRIES	  = 3
 
 def openSequenceFetch(ids, tool, email, db='nucleotide', retmode='text', rettype='fasta',batchsize=BATCHSIZE,sleeptime=SLEEPTIME):
     lasttime = 0
     for i in xrange(0, len(ids), batchsize):
+
+	# Get the next batch of ids.
 	params = urllib.urlencode(
 	   {'db': db,
 	    'retmode' : retmode,
@@ -27,17 +33,44 @@ def openSequenceFetch(ids, tool, email, db='nucleotide', retmode='text', rettype
 	    'tool' : tool,
 	    'email' : email
 	    })
-	#
-	t = time.time()
-	st = max(0,sleeptime - (t - lasttime))
-	if st > 0:
-	    time.sleep(st)
-	lasttime = t+st
-	#
-	f = urllib.urlopen(FETCHURL, params)
-	for line in f:
+
+	# For each batch, try up to NTRIES time to get the sequences. Provides
+	# some protection from intermittant errors for the eUtils server.
+	for ntry in range(NTRIES):
+	    # Throttle frequency of requests.
+	    t = time.time()
+	    st = max(0,sleeptime - (t - lasttime))
+	    if st > 0:
+		time.sleep(st)
+	    lasttime = t+st
+
+	    # Crude error checking. If first character returned by a batch is not ">", assume it's
+	    # an error page. Write the page to stderr, and exit.
+	    try:
+		fd = urllib.urlopen(FETCHURL, params)
+	    except:
+		continue
+
+	    line = fd.readline()
+	    if not line:
+		break
+	    elif not line.startswith(">"):
+		if ntry == NTRIES-1:
+		    # Last try. Write the error to stderr.
+		    sys.stderr.write(line)
+		    sys.stderr.write(fd.read())
+		fd.close()
+		continue
+
+	    # success!
 	    yield line
-	f.close()
+	    for line in fd:
+		yield line
+	    fd.close()
+	    break
+	else:
+	    # if we exhaust the loop, there was an error
+	    raise RuntimeError("Error from eutils.")
 
 def fetchSequences(
 	infile,
