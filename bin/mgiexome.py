@@ -86,7 +86,7 @@ def main(infile,outfile=None):
 	for f in grp:
 	    if f.source == "MGI":
 		mgi2symbol[f.ID[4:]] = f.Name
-	    elif f.type == "exon" and f.attributes.has_key('Dbxref'):
+	    elif f.type in ["exon","match-part"] and f.attributes.has_key('Dbxref'):
 		#
 		# Exon with a Dbxref attribute. Add this exon to all MGI ids
 		#

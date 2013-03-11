@@ -642,7 +642,7 @@ class MGIGFFMaker(object):
 	    sids.append(ss)
 	    for i in range(a.blockCount):
 		sz = a.blockSizes[i]
-		st = a.tStarts[i]+1
+		st = a.tStarts[i]
 		se = st + sz - 1
 		# write "match-part" feature (alignment fragment)
 		mpf = gff3.Feature([a.tName[3:], 'Blat', 'match-part', st, se, '.', a.strand, '.', {}])
