@@ -11,6 +11,10 @@
 # Genes associated with multiple models unions the exons across
 # all models. Models associated with multiple genes contribute
 # to the exons for all genes. 
+#
+# 2013-03-18 jer - Handle pseudogenes (look for "pseudogenic_exons").
+# Special handling for some NCBI pseudogenes, which have no internal structure, just start/end.
+# The search for "pseudogenic_exon" doesn't find anything for these. 
 # 
 
 import sys
@@ -77,23 +81,26 @@ def main(infile,outfile=None):
     mgi2symbol = {}
 
     #
-    # Iterate. 
+    # Iterate by groups, separated by "###". 
     #
-    for grp in gff3.iterate(infile,True): # iterate by groups, separated by "###"
+    for grp in gff3.iterate(infile,True): 
 	mgi2exons = {}
 	currMgiId = None
 	currMgiSymbol = None
+	mgipseudos = []
 	for f in grp:
 	    if f.source == "MGI":
-		mgi2symbol[f.ID[4:]] = f.Name
-	    elif f.type in ["exon","match-part"] and f.attributes.has_key('Dbxref'):
+		mgiid = f.ID[4:]
+		mgi2symbol[mgiid] = f.Name
+		if f.type == "pseudogene":
+		    mgipseudos.append(f)
+	    elif f.type in ["exon","pseudogenic_exon","match-part"] and f.attributes.has_key('Dbxref'):
 		#
 		# Exon with a Dbxref attribute. Add this exon to all MGI ids
 		#
 		dbx = f.Dbxref
 		if type(dbx) is types.StringType:
 		    dbx = [dbx]
-		nmgis = 0
 		for d in dbx:
 		    #
 		    # Accept both "MGI:MGI:12345" and "MGI:12345"
@@ -101,13 +108,20 @@ def main(infile,outfile=None):
 		    # 
 		    if d.startswith("MGI:"):
 			mgiid = d
-			nmgis += 1
 			if mgiid.startswith("MGI:MGI:"):
 			    mgiid = mgiid[4:]
 			g = gff3.Feature(f)
 			mgi2exons.setdefault(mgiid,[]).append(g)
 	# end: for f 
+
+	for f in mgipseudos:
+	    mgiid = f.ID[4:]
+	    if mgiid not in mgi2exons:
+		e = gff3.Feature(f)
+		mgi2exons[mgiid] = [e]
+
 	flush(mgi2exons, mgi2symbol, ofile)
+
     # end: for grp 
     ofile.close()
 

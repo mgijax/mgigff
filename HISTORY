@@ -1,3 +1,8 @@
+TAG: mgigff-5-1-2-2
+DATE: April 1, 2013
+STAFF: jer
+CHANGES: Include "pseudogenic_exon". Special case for NCBI pseudogenes that have no internal structure. Change config to write to standard directory.
+
 TAG: mgigff-5-1-2-1
 DATE: March 11, 2013
 STAFF: jer
