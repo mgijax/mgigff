@@ -16,6 +16,9 @@ fi
 FTPURL=ftp.informatics.jax.org
 export FTPURL
 
-GNUSORT=/usr/local/bin/sort
+GNUSORT=`which sort`
 export GNUSORT
+
+PERL=`which perl`
+export PERL
 
