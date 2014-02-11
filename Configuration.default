@@ -11,14 +11,3 @@ then
 fi
 
 . ${MGICONFIG}/master.config.sh
-
-
-FTPURL=ftp.informatics.jax.org
-export FTPURL
-
-GNUSORT=`which sort`
-export GNUSORT
-
-PERL=`which perl`
-export PERL
-

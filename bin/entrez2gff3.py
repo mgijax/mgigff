@@ -85,10 +85,6 @@ iGROUP	= 12 # group_label
 iTRANS	= 13 # transcript
 iECODE	= 14 # evidence_code
 
-# NCBI file contains annotations from multiple assemblies. We
-# just want the standard black-6 genes.
-ASSEMBLY = 'MGSCv37-C57BL/6J'
-
 class Entrez2GFF3(object):
     def __init__(self):
 	self.iFileName = None

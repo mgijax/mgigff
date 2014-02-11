@@ -191,11 +191,7 @@ class MGIGFFMaker(object):
 	self.dataDirectory = cfg['datadirectory']
 	if not (os.path.exists(self.dataDirectory) and os.path.isdir(self.dataDirectory)):
 	    raise RuntimeError("Data directory not found or is not a directory: %s"%self.dataDirectory)
-	self.workingDirectory = cfg['workingdirectory']
-	if not os.path.exists(self.workingDirectory):
-	    os.makedirs(self.workingDirectory)
-	elif not os.path.isdir(self.workingDirectory):
-	    raise RuntimeError("Working directory is not a directory: %s"%self.workingDirectory)
+	self.initWorkingDirectory(cfg['workingdirectory'])
 	self.distributionDirectory = cfg.get('distributiondirectory','')
 	if self.distributionDirectory and not (os.path.exists(self.distributionDirectory) and os.path.isdir(self.distributionDirectory)):
 	    raise RuntimeError("Distribution directory not found or is not a directory: %s"%self.distributionDirectory)
@@ -250,6 +246,19 @@ class MGIGFFMaker(object):
 
 	# log file of genes added by phase 2.
 	self.phase2added = os.path.join(self.workingDirectory, "phase2added.txt")
+
+    def initWorkingDirectory(self, wd):
+	"""
+	Initialize the working directory. Create it if it does not exist. 
+	Make sure it is empty.
+	"""
+	self.workingDirectory = wd
+	if not os.path.exists(wd):
+	    os.makedirs(wd)
+	elif not os.path.isdir(wd):
+	    raise RuntimeError("Working directory is not a directory: %s"%wd)
+	for fn in os.listdir(wd):
+	    os.remove(os.path.join(wd,fn))
 
     def initLogging(self):
 	"""
@@ -1014,7 +1023,6 @@ class Provider(object):
 	for fn in os.listdir(self.dir):
 	    if self.file_re.match(fn):
 	        self.file = os.path.join(self.dir,fn)
-		break
 	if self.file is None:
 	    raise IOError("No input file for provider " + self.name)
 	self.fstat = os.stat(self.file)
@@ -1040,12 +1048,9 @@ class Converter(object):
     def convert(self, infile, outfile):
 	cmd = self.cmdTmplt.replace('INPUT',infile).replace('OUTPUT', outfile)
 	logging.info("%s: Command=%s" % (self.name,cmd))
-	if newer(infile.split(), outfile.split()):
-	    status=os.system(cmd + ' 2>> ' + self.logFile)
-	    if status != 0:
-		raise RuntimeError("Converter failed. status=%s cmd=%s"%(status,cmd))
-	else:
-	    logging.info("Command was short circuited.")
+	status=os.system(cmd + ' 2>> ' + self.logFile)
+	if status != 0:
+	    raise RuntimeError("Converter failed. status=%s cmd=%s"%(status,cmd))
 
 
 #----------------------------------------------------------------------------

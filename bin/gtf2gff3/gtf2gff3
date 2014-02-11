@@ -1027,8 +1027,8 @@ sub validate_and_build_gene {
 
 		print STDERR "ERROR: seq_id conflict: " .
 		  "validate_and_build_gene\n" if $seq_id ne $trnsc->{seq_id};
-		print STDERR "ERROR: sourc`e conflict: " .
-		  "validate_and_build_gene\n" if $source ne $trnsc->{source};
+		#print STDERR "ERROR: sourc`e conflict: " .
+		  #"validate_and_build_gene\n" if $source ne $trnsc->{source};
 		print STDERR "ERROR: strand conflict: " .
 		  "validate_and_build_gene\n" if $strand ne $trnsc->{strand};
 		print STDERR "ERROR: gene_id conflict: " .
