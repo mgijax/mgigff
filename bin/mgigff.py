@@ -88,8 +88,6 @@ class MGIGFFMaker(object):
 	import pprint
 	s = pprint.pformat(self.config)
 	logging.log(level, s)
-	sys.stdout.write(s)
-	sys.stdout.write('\n')
 
     def go(self):
 	"""
@@ -280,6 +278,13 @@ class MGIGFFMaker(object):
 	    format='%(asctime)s %(levelname)s %(message)s',
 	    filename=self.logFile,
 	    filemode='a')
+
+	# also send log messages to the console
+	console = logging.StreamHandler()
+	console.setLevel(logging.INFO)
+	console.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+	logging.getLogger('').addHandler(console)
+
 	logging.info("\n\nMGIGFF started...")
 
 	self.showConfig()
