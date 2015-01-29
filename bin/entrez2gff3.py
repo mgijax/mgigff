@@ -248,7 +248,7 @@ class Entrez2GFF3(object):
 		# No transcript (gene segment from NCBI). Create a placeholder.
 		t  = gff3.Feature(gene)
 		id = "%s:presumedTranscript_%d" % \
-		    (gene.attributes['ID'],self.getIDCounter("presumed"))
+		    (gene.attributes['ID'], self.getIDCounter("presumed"))
 		# compute start/stop from subfeatures
 		start = 900000000
 		end = -1
@@ -385,7 +385,6 @@ class Entrez2GFF3(object):
         if self.currModel:
 	    self.finishGene()
 	self.currModelID = self.currTokens[iFID][7:] # strip off "GeneID:"
-	self.resetIDCounters()
 	self.continueGene()
 
     #-----------------------------------------------------

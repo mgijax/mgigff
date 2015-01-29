@@ -2,8 +2,10 @@
 # seqid2fa.py
 #
 # Fetches sequences from entrez by id. Input is a single-column file of ids.
-# Output is a fasta-formatted file of sequences from Genank (technically, from the nucleotide 
-# database accessible via NCBI eutils).
+# Output is a fasta-formatted file of sequences from Genbank (technically, 
+# from the nucleotide database accessible via NCBI eutils).
+# Usage:
+#	% python seqid2fa.py INFILE OUTFILE
 #
 #
 
@@ -14,14 +16,13 @@ import urllib
 import xml.dom.minidom
 
 FETCHURL  = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
-BATCHSIZE = 1000
-SLEEPTIME = 1
+BATCHSIZE = 500
+SLEEPTIME = 3
 TOOL      = "MGI"
 EMAIL     = "Joel.Richardson@jax.org"
 NTRIES	  = 3
 
 def openSequenceFetch(ids, tool, email, db='nucleotide', retmode='text', rettype='fasta',batchsize=BATCHSIZE,sleeptime=SLEEPTIME):
-    lasttime = 0
     for i in xrange(0, len(ids), batchsize):
 
 	# Get the next batch of ids.
@@ -35,18 +36,11 @@ def openSequenceFetch(ids, tool, email, db='nucleotide', retmode='text', rettype
 	    })
 
 	# For each batch, try up to NTRIES time to get the sequences. Provides
-	# some protection from intermittant errors for the eUtils server.
+	# some protection from intermittant errors from the eUtils server.
 	for ntry in range(NTRIES):
-	    # Throttle frequency of requests.
-	    t = time.time()
-	    st = max(0,sleeptime - (t - lasttime))
-	    if st > 0:
-		time.sleep(st)
-	    lasttime = t+st
 
-	    # Crude error checking. If first character returned by a batch is not ">", assume it's
-	    # an error page. Write the page to stderr, and exit.
 	    try:
+		time.sleep(sleeptime)
 		fd = urllib.urlopen(FETCHURL, params)
 	    except:
 		continue

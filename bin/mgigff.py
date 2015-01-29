@@ -94,12 +94,13 @@ class MGIGFFMaker(object):
 	Main.
 	"""
 	if self.doPhase1:
-	    self.phase1()
+	    self.phase1() # merging provider files, attaching MGI genes
 	if self.doPhase2:
-	    self.phase2()
+	    self.phase2() # Blat no-model gene seqs to generate ersatz models 
 
-	self.processSorted()
+	self.processSorted() # 
 	self.generateExomeFile()
+	#self.generateTabix()
 	self.moveToArchive()
 	logging.info("mgigff finished.\n\n")
 
@@ -388,6 +389,7 @@ class MGIGFFMaker(object):
 		feature = gff3.Feature(line)
 	        if feature is None:
 		    continue
+		#
 		# Remove Name attribute from all provider features
 		feature.attributes.pop('Name',None)
 		#
@@ -430,7 +432,7 @@ class MGIGFFMaker(object):
 			currmgistart = feature.start # for sorting
 		else:
 		    # For bottom-level features, remove their (unneeded) ID attribute
-		    if feature.type not in ["transcript","mRNA"]:
+		    if feature.type not in ["transcript","mRNA","ncRNA"]:
 			feature.attributes.pop('ID',None)
 		    # Propagate MGI ids to all subfeatures
 		    gid = currModel.attributes['ID']
@@ -779,6 +781,19 @@ class MGIGFFMaker(object):
 	mgiexome.main(os.path.join(self.workingDirectory,self.mgigffFileV), 
 		      os.path.join(self.workingDirectory,self.exomeFileV))
 
+    def generateTabix(self):
+	gff = os.path.join(self.workingDirectory,self.mgigffFileV)
+	gffgz = gff+".bgz"
+	tbi = gff+".tbi"
+	#
+	logging.info("Sorting/compressing GFF file...")
+        c = Converter('bgzip', self.config['converter']['BGZIP'] , self)
+	c.convert(gff,gffgz)
+	#
+	logging.info("Creating tabix index...")
+        c = Converter('tabix', self.config['converter']['TABIX'] , self)
+	c.convert(gffgz,tbi)
+
     def moveToArchive(self):
 	if not self.distributionDirectory:
 	    return
@@ -786,16 +801,23 @@ class MGIGFFMaker(object):
 	sf = os.path.join(self.workingDirectory,self.mgigffFileV)
 	df = os.path.join(self.distributionDirectory,self.mgigffFileV)
 	dlf= os.path.join(self.distributionDirectory,self.mgigffFileC)
+	esf = os.path.join(self.workingDirectory,self.exomeFileV)
+	edf = os.path.join(self.distributionDirectory,self.exomeFileV)
+	edlf= os.path.join(self.distributionDirectory,self.exomeFileC)
 	#
 	# remove destination files from distrib directory, if they exist
 	self.doCmd( "rm -f %s.gz %s.gz" % (df,dlf) )
+	self.doCmd( "rm -f %s.gz %s.gz" % (edf,edlf) )
 	#
 	# compress the GFF file and write to distrib directory
 	self.doCmd("gzip -c %s > %s.gz" % (sf,df))
+	self.doCmd("gzip -c %s > %s.gz" % (esf,edf))
 	#
 	# Create symbolic link
 	self.doCmd( "cd %s; rm -f %s.gz; ln -s %s.gz %s.gz" % \
 	   (self.distributionDirectory,self.mgigffFileC,self.mgigffFileV,self.mgigffFileC))
+	self.doCmd( "cd %s; rm -f %s.gz; ln -s %s.gz %s.gz" % \
+	   (self.distributionDirectory,self.exomeFileC,self.exomeFileV,self.exomeFileC))
 
     #-------------------------------------------------
     # FIXME: The remainder is all for getting gene data from MGI.
@@ -914,7 +936,7 @@ class MGIGFFMaker(object):
 	    insert into _ids
 	    select distinct 
 	       a.accid, a._LogicalDB_key, a2.accID, a._Object_key
-	    from ACC_Accession a, ACC_Accession a2, MRK_Marker mm
+	    from ACC_Accession a, ACC_Accession a2, MRK_Marker mm, MRK_Location_Cache c
 	    where a._LogicalDB_key in (%s)
 	    and a._Object_key = a2._Object_key
 	    and a._MGIType_key = 2
@@ -924,6 +946,8 @@ class MGIGFFMaker(object):
 	    and a2.preferred = 1
 	    and a2._Object_key = mm._Marker_key
 	    and mm._marker_status_key in (1,3)  /* include interim symbols */
+	    and mm._marker_key = c._marker_key
+	    and c.startcoordinate is not null
 	    ''' % COMMA.join(map(str,self.k2provider.keys())), None, conn)
 
 	#
