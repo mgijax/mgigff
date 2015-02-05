@@ -1,3 +1,8 @@
+TAG: mgigff-5-2-1-5
+DATE: 2/5/2015
+STAFF: jer
+CHANGES: Catch null strand values and convert to ".".
+
 TAG: mgigff-5-2-1-4
 DATE: 2/3/2015
 STAFF: dbm

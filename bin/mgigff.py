@@ -874,6 +874,9 @@ class MGIGFFMaker(object):
 	if noModels:
 	    logging.error("No models found?? %s"%mid)
 
+	if m['strand'] is None:
+	    m['strand'] = "."
+
 	mgiMarker = gff3.Feature([
 	    m['chromosome'],
 	    "MGI",
