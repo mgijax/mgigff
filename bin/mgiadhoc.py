@@ -12,7 +12,7 @@ import psycopg2
 import psycopg2.extras
 
 # Default connection parameters
-HOST="adhoc.informatics.jax.org"
+HOST="mgi-adhoc.jax.org"
 DATABASE="mgd"
 USER="mgd_public"
 PASSWORD="mgdpub"
