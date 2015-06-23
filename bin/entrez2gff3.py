@@ -118,6 +118,7 @@ class Entrez2GFF3(object):
 	(self.options,self.posArgs) = self.optParser.parse_args(argv)
 	if self.options.assembly is None:
 	    self.optParser.error("No assembly specified.")
+	self.options.assembly_re = re.compile(self.options.assembly)
 	if len(self.posArgs) == 2:
 	    self.iFileName = self.posArgs[1]
 	else:
@@ -414,7 +415,7 @@ class Entrez2GFF3(object):
 	    self.currTokens[-1] = self.currTokens[-1].strip()
 
 	    # only interested in Black 6 at this time
-	    if self.currTokens[iGROUP] != self.options.assembly:
+	    if not self.options.assembly_re.match(self.currTokens[iGROUP]):
 	        continue
 
 	    # new gene?

@@ -1,3 +1,8 @@
+TAG: mgigff-5-2-1-7
+DATE: 6/23/2015
+STAFF: jer
+CHANGES: Change assembly build match to use a regex. Also, tweak the gtf2gff3 parsing to deal with semicolons in attribute values.
+
 TAG: mgigff-5-2-1-6
 DATE: 4/1/2015
 STAFF: jer

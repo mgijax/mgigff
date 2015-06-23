@@ -218,7 +218,7 @@ sub parse_attributes {
 
 		if ($attrb =~ $ATTRB_REGEX) {
 			($key, $value) = ($1, $2);
-			$value =~ s/\"//g if $value !~ /\s/;
+			$value =~ s/\"|;//g if $value !~ /\s/;
 		}
 		else {
 			print STDERR "ERROR:  Missing or non-standard attributes: $attrb\n";
