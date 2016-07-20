@@ -1,3 +1,14 @@
+TAG: mgigff-6-0-5-0
+DATE: 7/20/2016
+STAFF: lnh
+CHANGES: TR12386 - 
+1) config.cfg->[converter.GFCLIENT] section: Set host= mgi-prodapp2.jax.org
+2) config.cfg->[converter.GFCLIENT] section : Set port=9038
+3) config.cfg->[converter.ENTREZ2GFF3] section: Changed the regular expression in the command field from ‘ ‘ to “\t”
+4) config.cfg->[converter.PHASE2MERGE] section : Changed the regular expression in the command field from “ ” to “\t”
+5) config.cfg->[converter.ENTREZ2GFF3] section: Changed the rassemblyarg expression from "GRCm38.p\d+-C57BL/6J " to “GRCm38.p\\d+-C57BL/6J”
+ 
+
 TAG: mgigff-5-2-1-8
 DATE: 3/3/2016
 STAFF: jer
