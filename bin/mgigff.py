@@ -948,7 +948,7 @@ class MGIGFFMaker(object):
 	    and a2._MGIType_key = 2
 	    and a2.preferred = 1
 	    and a2._Object_key = mm._Marker_key
-	    and mm._marker_status_key in (1,3)  /* include interim symbols */
+	    and mm._marker_status_key = 1
 	    and mm._marker_type_key != 10 /* exclude Complex/cluster/regions */
 	    and mm._marker_key = c._marker_key
 	    and c.startcoordinate is not null

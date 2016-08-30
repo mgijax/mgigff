@@ -1,3 +1,8 @@
+TAG: mgigff-6-0-5-1
+DATE: 8/30/2016
+STAFF: jer
+CHANGES: Remove ref to _marker_status_key = 3 (TR11083)
+
 TAG: mgigff-6-0-5-0
 DATE: 7/20/2016
 STAFF: lnh
