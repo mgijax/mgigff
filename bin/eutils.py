@@ -10,7 +10,7 @@ import time
 import urllib
 import xml.dom.minidom
 
-BASEURL   = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
+BASEURL   = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
 FETCHURL  = BASEURL + 'efetch.fcgi'
 SEARCHURL = BASEURL + 'esearch.fcgi'
 POSTURL   = BASEURL + 'epost.fcgi'
