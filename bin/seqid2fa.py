@@ -15,7 +15,7 @@ import time
 import urllib
 import xml.dom.minidom
 
-FETCHURL  = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+FETCHURL  = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
 BATCHSIZE = 500
 SLEEPTIME = 3
 TOOL      = "MGI"
