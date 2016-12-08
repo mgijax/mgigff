@@ -11,12 +11,21 @@ LOG=`pwd`/startGfServer.log
 rm -f ${LOG}
 touch ${LOG}
 
+working_dir=`pwd`
+if [ ! -f Configuration ]
+then
+  echo "The main configuration file $working_dir/Configuration does not exist"
+  exit 1
+fi 
+. Configuration
+
 date | tee -a ${LOG}
 
 
-SERVER_NAME=`uname -n`
+#SERVER_NAME=`uname -n`
+SERVER_NAME=$BLAT_HOST
 GF_SERVER=`which gfServer`
-PORT=9038
+PORT=$BLAT_PORT
 
 NIBDIR=/data/research/dna/mouse_build_38_nib
 LOG_FILE=/data/loads/mgi/mgigff/logs/gfServer.log
