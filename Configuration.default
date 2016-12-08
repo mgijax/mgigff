@@ -3,7 +3,6 @@
 # Configuration file (mgiconfig) for mgigff product.
 # See also: config.cfg in this directory.
 #
-
 if [ "${MGICONFIG}" = "" ]
 then
     MGICONFIG=/usr/local/mgi/live/mgiconfig
