@@ -11,11 +11,3 @@ then
 fi
 
 . ${MGICONFIG}/master.config.sh
-
-## Set the name of the blat server to use
-#
-BLAT_HOST=${BLAT_HOST_DEV}
-if [ "${INSTALL_TYPE}" = prod ]
-then
-   BLAT_HOST=${BLAT_HOST_PROD}
-fi
