@@ -6,9 +6,11 @@
 #
 # To check: ps -ef| grep gfServer
 #
-cd `dirname $0`/..
+cd `dirname $0`
 LOG=`pwd`/startGfServer.log
 rm -f ${LOG}
+touch ${LOG}
+
 date | tee -a ${LOG}
 
 
@@ -18,6 +20,9 @@ PORT=9038
 
 NIBDIR=/data/research/dna/mouse_build_38_nib
 LOG_FILE=/data/loads/mgi/mgigff/logs/gfServer.log
+rm -f ${LOG_FILE}
+touch ${LOG_FILE}
+
 # the set of chromosome nib files to load
 CHR="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 X Y MT"
 
