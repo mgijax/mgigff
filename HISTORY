@@ -4,6 +4,7 @@ STAFF: lnh
 CHANGES:
 1)Configuration.default: Added BLAT_HOST to set blat server name using mgiconfig
 2)config.cfg->[converter.GFCLIENT] section:   Set host=%{blat_host}s
+3)config.cfg->[converter.GFCLIENT] section:   Set port=%{blat_port}s
 
 
 TAG: mgigff-6-0-6-1
