@@ -29,11 +29,10 @@ def readSeqIdFile(fname):
 
 def merge(fname, idx):
     for a in psl.iterate(fname):
-	tokens = a.qName.split(PIPE)
-	seqid = tokens[3].rsplit(DOT,1)[0]
+	seqid = a.qName.rsplit(DOT,1)[0]
 	mgistuff = idx.get(seqid,None)
 	if mgistuff:
-	    a.qName = PIPE.join(mgistuff+tokens)
+	    a.qName = PIPE.join(mgistuff+[seqid])
 	    sys.stdout.write(str(a))
 	else:
 	    sys.stderr.write('Skipping id %s. Data = %s\n' % (seqid, str(a)))

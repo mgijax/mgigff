@@ -2,6 +2,8 @@
 # convertNCBI.py
 #
 # Filters NCBI file for features on one of the chromosomes in the chromosome file.
+# Usage:
+#  python convertNCBI.py /path/to/ncbidatafile.gff3 > output.gff3
 # 
 # 
 # 
@@ -18,24 +20,11 @@ HASH	= '#'
 class ConvertNCBI:
     def __init__(self, args):
 	self.ncbiGffFile = args[1]
-	self.chrConvFile = os.path.join(os.path.dirname(self.ncbiGffFile), 'chr_accessions_GRCm38.p2')
 	self.id2chr = {} 	# maps chr seq id to chr, e.g., NC_000079.6 to chr 13.
 	self.iid2xid= {}	# maps internal id to external, e.g., gene47 -> GeneID:10012341
+	self.currentRegionId = None
+	self.currentRegion = None
 	
-    def loadChrConvFile(self, fname):
-	'''
-	Loads the chromosome lookup table. This is a tab delimited
-	'''
-	ix = {}
-	fd = open(fname, 'r')
-	for l in fd:
-	    if l.startswith(HASH):
-		continue
-	    flds = l.split(TAB)
-	    ix[flds[1]] = flds[0]
-	fd.close()
-	return ix
-    
     def getGeneID(self, f):
 	ids = f.attributes.get('Dbxref',[])
 	if type(ids) is types.StringType:
@@ -47,14 +36,54 @@ class ConvertNCBI:
 	return None
 
     def process(self, f):
-	chr = self.id2chr.get(f[0], None)
-	if chr is None or f[2] in ['region','cDNA_match']:
+	# NCBI file has multi-level sort, with first level being by region 
+	# (e.g. a chromosome or a contig)
+	# A feature with 'region' in col 3 introduces a new region, and its features
+	# will follow. See if it's one we want.
+	if f[2] == 'region':
+	  if f[0] == self.currentRegionId:
+	    # A region feature within the current region. Skip.
 	    return None
-	f[0] = chr
+	  # Region with a different ID. See if it's one we care about.
+	  self.currentRegionId = f[0]
+	  chr = f.attributes.get('chromosome',None)
+	  map = f.attributes.get('map', None)
+	  genome = f.attributes.get('genome', None)
+	  if f.attributes.get('strain',None) != 'C57BL/6J':
+	    # skip anything not on B6
+	    self.currentRegion = None
+	  elif chr == 'Unknown':
+	    # unplaced contig
+	    self.currentRegion = f[0]
+	  elif genome == 'genomic':
+	    # unlocalized contig
+	    self.currentRegion = chr + '|' + f[0]
+	  elif genome == 'chromosome':
+	    # regular ol' chromosome
+	    self.currentRegion = chr
+	  elif genome == 'mitochondrion':
+	    # mitochondrion
+	    self.currentRegion = 'MT'
+	  else:
+	    # something else
+	    self.currentRegion = None
+	  return None
+	#
+	if f[0] != self.currentRegionId:
+	  raise RuntimeError('Internal error. Region id mismatch detected.' + str(f))
+	if self.currentRegion is None:
+	  return None
+	#  
+	if f[2] in ['match','cDNA_match']:
+	  return None
+	#
+	f[0] = self.currentRegion
 	isPseudo = f.attributes.get('pseudo',False)
 	f[1] = isPseudo and 'PSEUDO' or f[2]
 	fgid = self.getGeneID(f)
+	fxid = f.attributes.get('transcript_id',None)
 	fp  = f.attributes.get('Parent',None)
+	fid = f.ID
 	f.attributes.clear()
 	if not fp:
 	    if fgid:
@@ -63,13 +92,16 @@ class ConvertNCBI:
 	    else:
 		f.ID = fid
 	else:
-	    f.ID = fid
 	    f.Parent = self.iid2xid.get(fp,fp)
+	    if fxid and ('RNA' in f[2] or 'transcript' in f[2]):
+	        f.ID = fxid
+		self.iid2xid[fid]=fxid
+	    else:
+	        f.ID = fid
 
 	return f
 
     def main(self):
-	self.id2chr = self.loadChrConvFile(self.chrConvFile)
 	for f in gff3.iterate(self.ncbiGffFile):
 	    if self.process(f):
 		sys.stdout.write(str(f))
