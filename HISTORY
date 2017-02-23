@@ -1,3 +1,9 @@
+TAG: mgigff-6-0-7-2
+DATE: 2/23/2017
+STAFF: jer
+CHANGES:
+1)Convert process to use GFF3 from NCBI (stop using seq.md)
+
 TAG: mgigff-6-0-7-1
 DATE: 12/8/2016
 STAFF: lnh
