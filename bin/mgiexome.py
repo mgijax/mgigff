@@ -8,7 +8,10 @@
 # GFF3 file. Each exon is given an ID and is tagged with the
 # mgi id and symbol of its gene. 
 #
-# Genes associated with multiple models unions the exons across
+# The previous statement is almost correct. This program also 
+# outputs pseudogenic_exons and match_parts.
+#
+# Genes associated with multiple models union the exons across
 # all models. Models associated with multiple genes contribute
 # to the exons for all genes. 
 #

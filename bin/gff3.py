@@ -247,6 +247,14 @@ def iterate(input, returnGroups=False):
 	input.close()
 
 #----------------------------------------------------
+# Builds and returns an index from feature.ID to feature.
+# Args:
+#  features: (enumerable) the features to index
+#  id2feature (dict, optional) If provided, adds entries. 
+#		Otherwise, creates a new index.
+# Returns:
+#  A dictionary { ID -> Feature }
+#
 def index(features, id2feature={}):
     for f in features:
 	id = f.attributes.get("ID",None)
@@ -255,6 +263,9 @@ def index(features, id2feature={}):
     return id2feature
 
 #----------------------------------------------------
+# Turns all Parent attributes in a group of features in actual object references.
+# All referenced Parent objects must be among the given set of features (error otherwise).
+#
 def crossReference(features):
     id2feature = index(features)
     for f in features:
@@ -269,7 +280,6 @@ def crossReference(features):
 	    parent.attributes.setdefault("children",[]).append(f)
     return id2feature
 #----------------------------------------------------
-#
 # Parses one line from a GFF3 file.
 # Returns None if the line is a comment line. Otherwise,
 # returns a list of values. If parseCol9 is True,
@@ -290,7 +300,6 @@ def parse(line, parseCol9=True):
     return tokens
 
 #----------------------------------------------------
-#
 # Parses a string of name-value attributes, as defined by GFF3. 
 # Returns the corresponding dictionary. 
 # 

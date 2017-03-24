@@ -35,6 +35,42 @@ class ConvertNCBI:
 	#raise RuntimeError("No GeneID found in " + str(f))
 	return None
 
+    # The default sort of the file from NCBI is such that the features of one gene can be
+    # interspersed with features from another. The mgigff process requires that all features for
+    # a gene be together in an unbroken sequence. This iterator iterates over features sorted the
+    # NBCI way and yields them sorted the way mgigff needs it.
+    #
+    def regroupingIterator(self, features):
+	lastSeq = None
+	groups = []
+	for f in features:
+	    #
+	    if f.seqid != lastSeq:
+		for glist, gset in groups:
+		   for f2 in glist:
+		       yield f2
+		groups = []
+	    lastSeq = f.seqid
+	    #
+	    p = f.attributes.get('Parent', None)
+	    if not p:
+		# feature is top-level
+		groups.append( ([f], set([f.ID])) )
+	    else:
+		# feature is part of something else. 
+		pid = p
+		for i in range(len(groups)-1, -1, -1):
+		  glist, gset = groups[i]
+		  if pid in gset:
+		    glist.append(f)
+		    gset.add(f.ID)
+		    break
+		else:
+		  raise RuntimeError("Orphan feature: " + str(f))
+	for glist, gset in groups:
+	    for f in glist:
+	        yield f
+
     def process(self, f):
 	# NCBI file has multi-level sort, with first level being by region 
 	# (e.g. a chromosome or a contig)
@@ -69,9 +105,11 @@ class ConvertNCBI:
 	    self.currentRegion = None
 	  return None
 	#
+	# A feature in the current region
 	if f[0] != self.currentRegionId:
 	  raise RuntimeError('Internal error. Region id mismatch detected.' + str(f))
 	if self.currentRegion is None:
+	  # don't care about this region
 	  return None
 	#  
 	if f[2] in ['match','cDNA_match']:
@@ -101,10 +139,14 @@ class ConvertNCBI:
 
 	return f
 
-    def main(self):
+    def mainIterator(self):
 	for f in gff3.iterate(self.ncbiGffFile):
 	    if self.process(f):
-		sys.stdout.write(str(f))
+		yield f
+
+    def main(self):
+        for f in self.regroupingIterator(self.mainIterator()):
+	    sys.stdout.write(str(f))
 
 #
 if __name__ == "__main__":
